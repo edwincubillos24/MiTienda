@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Mi Tienda</string>
+    <string name="digite_email">Digite correo electronico</string>
+    <string name="digite_contrasena">Digite contrasena</string>
+    <string name="iniciar_sesion">Iniciar Sesion</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="repita_contrasena">Repita Contrasena</string>
+    <string name="title_activity_productos">ProductosActivity</string>
+    <string name="nombre_del_producto">Nombre del Producto</string>
+    <string name="precio">Precio</string>
+    <string name="descripcion">Descripcion</string>
+    <string name="guardar_producto">Guardar Producto</string>
+    <string name="nombre_producto">Nombre Producto</string>
+    <string name="descripcion_producto">Descripcion del producto</string>
+    <string name="precio_producto">$20000</string>
+</resources>
