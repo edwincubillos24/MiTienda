@@ -2,14 +2,17 @@ package com.cubidevs.mitienda;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +27,8 @@ import java.util.ArrayList;
 public class ProductosActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener authStateListener;
+
     private ArrayList<Producto> productosList;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapterProductos;
@@ -39,21 +44,20 @@ public class ProductosActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mAuth = FirebaseAuth.getInstance();
+
+        initialize();
         loadData();
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
         productosList = new ArrayList<>();
 
-        adapterProductos = new ProductosAdapter(productosList, R.layout.producto_item);
+        adapterProductos = new ProductosAdapter(this, productosList, R.layout.producto_item);
 
         recyclerView.setAdapter(adapterProductos);
-
-        mAuth = FirebaseAuth.getInstance();
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +66,34 @@ public class ProductosActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.mCerrarSesion){
+            mAuth.signOut();
+            Intent intent = new Intent(ProductosActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initialize() {
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if (firebaseUser == null){
+                    Intent intent = new Intent (ProductosActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
     }
 
     private void loadData() {
@@ -72,13 +104,13 @@ public class ProductosActivity extends AppCompatActivity {
         myRef.child("productos").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("info",dataSnapshot.toString());
+                Log.d("info", dataSnapshot.toString());
                 productosList.clear();
-                if (dataSnapshot.exists()){
-                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Producto producto = snapshot.getValue(Producto.class);
                         productosList.add(producto);
-                        Log.d("dato",producto.getNombre());
+                        Log.d("dato", producto.getNombre());
                     }
                     adapterProductos.notifyDataSetChanged();
                 }
@@ -92,7 +124,6 @@ public class ProductosActivity extends AppCompatActivity {
         });
 
     }
-
 
 
 }
